@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     YOUTUBE_API_KEY: str = ""
     GOOGLE_MAPS_API_KEY: str = ""
     UNSPLASH_ACCESS_KEY: str = ""
+    CORS_ORIGINS: str = "http://localhost:3000"
 
 
 settings = Settings()
