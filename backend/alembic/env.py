@@ -17,8 +17,9 @@ db_url = os.environ.get("DATABASE_URL")
 if db_url:
     config.set_main_option("sqlalchemy.url", db_url)
 
-# Import models so autogenerate can detect them
-from app.models.weather_query import Base  # noqa: E402
+# Import Base and all models so autogenerate can detect them
+from app.database import Base  # noqa: E402
+import app.models.weather_query  # noqa: F401 — registers model with Base
 
 target_metadata = Base.metadata
 
