@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ErrorMessage from "./ErrorMessage";
 
 interface Props {
@@ -11,6 +11,12 @@ interface Props {
 export default function SearchBar({ onSearch, loading }: Props) {
   const [input, setInput] = useState("");
   const [geoError, setGeoError] = useState("");
+  const [geoSupported, setGeoSupported] = useState(false);
+
+  // Detect geolocation support only on the client (avoids SSR hydration mismatch)
+  useEffect(() => {
+    setGeoSupported("geolocation" in navigator);
+  }, []);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,19 +26,22 @@ export default function SearchBar({ onSearch, loading }: Props) {
 
   function handleGeolocate() {
     setGeoError("");
-    if (!navigator.geolocation) {
-      setGeoError("Geolocation is not supported by your browser. Please enter a location manually.");
-      return;
-    }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const loc = `${pos.coords.latitude},${pos.coords.longitude}`;
+        const loc = `${pos.coords.latitude.toFixed(5)},${pos.coords.longitude.toFixed(5)}`;
         setInput(loc);
         onSearch(loc);
       },
-      () => {
-        setGeoError("Location access was denied. Please enter a location manually.");
-      }
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          setGeoError("Location access was denied. Please enter a location manually.");
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setGeoError("Your location is currently unavailable. Please enter a location manually.");
+        } else {
+          setGeoError("Could not retrieve your location. Please enter a location manually.");
+        }
+      },
+      { timeout: 10000 }
     );
   }
 
@@ -43,9 +52,10 @@ export default function SearchBar({ onSearch, loading }: Props) {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="City, zip code, coordinates, or landmark…"
+          placeholder="City, zip code, GPS coordinates, or landmark…"
           className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           disabled={loading}
+          aria-label="Location search"
         />
         <button
           type="submit"
@@ -54,14 +64,15 @@ export default function SearchBar({ onSearch, loading }: Props) {
         >
           {loading ? "Searching…" : "Search"}
         </button>
-        {typeof navigator !== "undefined" && "geolocation" in navigator && (
+        {geoSupported && (
           <button
             type="button"
             onClick={handleGeolocate}
             disabled={loading}
             className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+            aria-label="Use my current location"
           >
-            📍 Use my location
+            📍 My location
           </button>
         )}
       </form>
