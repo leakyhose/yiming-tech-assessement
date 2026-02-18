@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+/* Ensure images don't overflow on small screens */
+img {
+  max-width: 100%;
+}
+
+/* Smooth transitions for interactive elements */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
