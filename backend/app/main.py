@@ -7,9 +7,17 @@ from app.config import settings
 
 app = FastAPI(title="Weather App API", version="1.0.0")
 
+# Parse CORS origins from env, always include common dev/prod origins
+cors_origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
+cors_origins.extend([
+    "http://localhost:3000",
+    "https://yiming-tech-assessement.vercel.app",
+])
+cors_origins = list(set(cors_origins))  # dedupe
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[o.strip() for o in settings.CORS_ORIGINS.split(",")],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
