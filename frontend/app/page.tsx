@@ -8,7 +8,7 @@ import PhotoBanner from "@/components/PhotoBanner";
 import MapEmbed from "@/components/MapEmbed";
 import YoutubePanel from "@/components/YoutubePanel";
 import ErrorMessage from "@/components/ErrorMessage";
-import { fetchCurrentWeather, fetchPhotos, fetchMaps, fetchYouTube } from "@/lib/api";
+import { fetchCurrentWeather, fetchPhotos, fetchMaps, fetchYouTube, createQuery } from "@/lib/api";
 
 type Weather = Awaited<ReturnType<typeof fetchCurrentWeather>>;
 type Photos = { photos: { url: string; alt: string; photographer: string; photographer_url: string }[] };
@@ -28,6 +28,13 @@ export default function HomePage() {
   const [videoError, setVideoError] = useState(false);
   const [photoError, setPhotoError] = useState(false);
 
+  const [saveOpen, setSaveOpen] = useState(false);
+  const [saveStart, setSaveStart] = useState("");
+  const [saveEnd, setSaveEnd] = useState("");
+  const [saveSaving, setSaveSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
   async function handleSearch(location: string) {
     setLoading(true);
     setError("");
@@ -39,6 +46,11 @@ export default function HomePage() {
     setVideoError(false);
     setPhotoError(false);
     setCurrentLocation(location);
+    setSaveOpen(false);
+    setSaveStart("");
+    setSaveEnd("");
+    setSaveError("");
+    setSaveSuccess(false);
 
     let resolvedName = location;
     try {
@@ -72,6 +84,21 @@ export default function HomePage() {
     else setVideoError(true);
   }
 
+  async function handleSaveQuery(e: React.FormEvent) {
+    e.preventDefault();
+    setSaveError("");
+    setSaveSaving(true);
+    try {
+      await createQuery({ location: currentLocation, start_date: saveStart, end_date: saveEnd });
+      setSaveSuccess(true);
+      setSaveOpen(false);
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : "Failed to save query.");
+    } finally {
+      setSaveSaving(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Search */}
@@ -98,6 +125,62 @@ export default function HomePage() {
           {photos && !photoError && <PhotoBanner photos={photos.photos} />}
 
           <WeatherCard data={weather} />
+
+          {/* Save to Queries */}
+          <div>
+            {!saveOpen && !saveSuccess && (
+              <button
+                onClick={() => setSaveOpen(true)}
+                className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                Save to Queries
+              </button>
+            )}
+            {saveSuccess && (
+              <p className="text-sm text-green-600">Saved. View it in <Link href="/history" className="underline">Saved Queries</Link>.</p>
+            )}
+            {saveOpen && (
+              <form onSubmit={handleSaveQuery} className="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 p-4">
+                <div>
+                  <label className="mb-1 block text-xs text-gray-500">Start Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={saveStart}
+                    onChange={(e) => setSaveStart(e.target.value)}
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs text-gray-500">End Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={saveEnd}
+                    onChange={(e) => setSaveEnd(e.target.value)}
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={saveSaving}
+                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  >
+                    {saveSaving ? "Saving…" : "Save"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSaveOpen(false); setSaveError(""); }}
+                    className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+                {saveError && <p className="w-full text-xs text-red-600">{saveError}</p>}
+              </form>
+            )}
+          </div>
 
           <Link
             href={`/forecast?location=${encodeURIComponent(currentLocation)}`}
