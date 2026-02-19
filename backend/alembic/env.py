@@ -2,10 +2,14 @@ import asyncio
 import os
 from logging.config import fileConfig
 
+from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
+
+# Load .env file so DATABASE_URL is available
+load_dotenv()
 
 config = context.config
 
