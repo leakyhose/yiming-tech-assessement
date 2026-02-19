@@ -1,11 +1,15 @@
 @import "tailwindcss";
 
-/* Ensure images don't overflow on small screens */
-img {
-  max-width: 100%;
-}
+@layer base {
+  img {
+    max-width: 100%;
+  }
 
-/* Smooth transitions for interactive elements */
-* {
-  -webkit-tap-highlight-color: transparent;
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }
 }

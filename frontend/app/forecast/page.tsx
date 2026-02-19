@@ -19,7 +19,6 @@ interface DayForecast {
 function ForecastContent() {
   const searchParams = useSearchParams();
   const location = searchParams.get("location") || "";
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [daily, setDaily] = useState<DayForecast[]>([]);
@@ -27,7 +26,6 @@ function ForecastContent() {
 
   useEffect(() => {
     if (!location) return;
-
     setLoading(true);
     setError("");
     fetchForecast(location)
@@ -41,44 +39,42 @@ function ForecastContent() {
 
   if (!location) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         <ErrorMessage message="No location specified. Please search from the home page." />
-        <Link href="/" className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
-          ← Back to search
-        </Link>
+        <Link href="/" className="text-sm text-blue-600 hover:underline">← Back to search</Link>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">5-Day Forecast</h1>
-        <Link href="/" className="text-sm text-blue-600 hover:underline">
-          ← Back to search
-        </Link>
+        <h1 className="text-xl font-semibold text-gray-900">5-Day Forecast</h1>
+        <Link href="/" className="text-sm text-blue-600 hover:underline">← Back</Link>
       </div>
 
       {error && <ErrorMessage message={error} />}
 
       {loading && (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 animate-pulse">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 animate-pulse">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-44 rounded-2xl bg-slate-200" />
+            <div key={i} className="h-40 rounded-lg bg-gray-100" />
           ))}
         </div>
       )}
 
-      {!loading && !error && (
-        <ForecastGrid daily={daily} locationName={resolvedName} />
-      )}
+      {!loading && !error && <ForecastGrid daily={daily} locationName={resolvedName} />}
     </div>
   );
 }
 
 export default function ForecastPage() {
   return (
-    <Suspense fallback={<div className="animate-pulse h-44 rounded-2xl bg-slate-200" />}>
+    <Suspense fallback={
+      <div className="grid grid-cols-5 gap-3 animate-pulse">
+        {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-40 rounded-lg bg-gray-100" />)}
+      </div>
+    }>
       <ForecastContent />
     </Suspense>
   );

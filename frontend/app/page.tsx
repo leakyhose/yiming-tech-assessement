@@ -15,17 +15,15 @@ type Photos = { photos: { url: string; alt: string; photographer: string; photog
 type MapData = { embed_url: string; resolved_name: string };
 type Videos = { videos: { videoId: string; title: string; thumbnail: string; channelTitle: string }[] };
 
+
 export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [currentLocation, setCurrentLocation] = useState("");
-
   const [weather, setWeather] = useState<Weather | null>(null);
   const [photos, setPhotos] = useState<Photos | null>(null);
   const [mapData, setMapData] = useState<MapData | null>(null);
   const [videos, setVideos] = useState<Videos | null>(null);
-
-  // Per-section media errors (non-blocking)
   const [mapError, setMapError] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [photoError, setPhotoError] = useState(false);
@@ -42,108 +40,89 @@ export default function HomePage() {
     setPhotoError(false);
     setCurrentLocation(location);
 
-    // Phase 1: fetch weather + photos in parallel (critical)
+    let resolvedName = location;
     try {
-      const [weatherResult, photosResult] = await Promise.allSettled([
-        fetchCurrentWeather(location),
-        fetchPhotos(location),
-      ]);
+      const weatherResult = await fetchCurrentWeather(location);
+      setWeather(weatherResult);
 
-      if (weatherResult.status === "rejected") {
-        setError(weatherResult.reason?.message || "Weather service is temporarily unavailable. Please try again later.");
-        setLoading(false);
-        return;
-      }
+      // Use the resolved city name so zip codes / GPS coords produce relevant media.
+      resolvedName = weatherResult.weather?.name || location;
+      setCurrentLocation(resolvedName);
 
-      setWeather(weatherResult.value);
-      if (photosResult.status === "fulfilled") {
-        setPhotos(photosResult.value as Photos);
-      } else {
-        setPhotoError(true);
-      }
-    } catch {
-      setError("Weather service is temporarily unavailable. Please try again later.");
+      const photosResult = await fetchPhotos(resolvedName).catch(() => null);
+      if (photosResult) setPhotos(photosResult as Photos);
+      else setPhotoError(true);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Weather service is temporarily unavailable. Please try again later.");
       setLoading(false);
       return;
     }
 
     setLoading(false);
 
-    // Phase 2: fetch map + YouTube in parallel (non-blocking)
     const [mapsResult, videosResult] = await Promise.allSettled([
-      fetchMaps(location),
-      fetchYouTube(location),
+      fetchMaps(resolvedName),
+      fetchYouTube(resolvedName),
     ]);
 
-    if (mapsResult.status === "fulfilled") {
-      setMapData(mapsResult.value as MapData);
-    } else {
-      setMapError(true);
-    }
+    if (mapsResult.status === "fulfilled") setMapData(mapsResult.value as MapData);
+    else setMapError(true);
 
-    if (videosResult.status === "fulfilled") {
-      setVideos(videosResult.value as Videos);
-    } else {
-      setVideoError(true);
-    }
+    if (videosResult.status === "fulfilled") setVideos(videosResult.value as Videos);
+    else setVideoError(true);
   }
 
   return (
     <div className="space-y-6">
-      {/* Hero */}
-      <div>
-        <h1 className="mb-1 text-3xl font-bold text-slate-800">Weather App</h1>
-        <p className="mb-5 text-slate-500">
-          Search any city, zip code, GPS coordinates, or landmark for real-time weather.
-        </p>
-        <SearchBar onSearch={handleSearch} loading={loading} />
+      {/* Search */}
+      <div className="text-center">
+        <h1 className="mb-1 text-2xl font-semibold text-gray-900">Weather App</h1>
+        <p className="mb-4 text-sm text-gray-500">Search any city, zip code, GPS coordinates, or landmark for real-time weather.</p>
+        <div className="mx-auto max-w-xl">
+          <SearchBar onSearch={handleSearch} loading={loading} />
+        </div>
       </div>
 
-      {/* Error */}
       {error && <ErrorMessage message={error} />}
 
-      {/* Loading skeleton */}
       {loading && (
-        <div className="space-y-4 animate-pulse">
-          <div className="h-40 rounded-2xl bg-slate-200" />
-          <div className="h-64 rounded-2xl bg-slate-200" />
+        <div className="space-y-3 animate-pulse">
+          <div className="h-36 rounded-lg bg-gray-100" />
+          <div className="h-48 rounded-lg bg-gray-100" />
         </div>
       )}
 
-      {/* Results */}
+      {/* Weather results */}
       {weather && !loading && (
         <>
-          {/* Photos */}
           {photos && !photoError && <PhotoBanner photos={photos.photos} />}
-          {photoError && (
-            <p className="text-sm text-slate-400 italic">📷 Photos unavailable for this location.</p>
-          )}
 
-          {/* Weather card */}
           <WeatherCard data={weather} />
 
-          {/* Forecast link */}
           <Link
             href={`/forecast?location=${encodeURIComponent(currentLocation)}`}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+            className="inline-block rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
           >
             See 5-Day Forecast →
           </Link>
 
-          {/* Map */}
-          {mapData && !mapError && (
-            <MapEmbed embed_url={mapData.embed_url} resolved_name={mapData.resolved_name} />
-          )}
-          {mapError && (
-            <p className="text-sm text-slate-400 italic">🗺️ Map unavailable for this location.</p>
-          )}
-
-          {/* YouTube */}
+          {mapData && !mapError && <MapEmbed embed_url={mapData.embed_url} resolved_name={mapData.resolved_name} />}
           {videos && !videoError && <YoutubePanel videos={videos.videos} />}
-          {videoError && (
-            <p className="text-sm text-slate-400 italic">📹 Videos unavailable for this location.</p>
-          )}
         </>
+      )}
+
+      {/* About — shown only before any search */}
+      {!weather && !loading && !error && (
+        <div className="mt-8 border-t border-gray-100 pt-8 text-center">
+          <p className="text-xs text-gray-400 mb-1">Built by Yiming Su</p>
+          <h2 className="text-base font-semibold text-gray-800 mb-2">About PM Accelerator</h2>
+          <p className="text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            The Product Manager Accelerator Program is designed to support PM professionals through every stage of their careers.
+            From students looking for entry-level jobs to Directors looking to take on a leadership role, our program has helped
+            hundreds of students fulfill their career aspirations. Our community are ambitious and committed — through our program
+            they have learnt, honed, and developed new PM and leadership skills, giving them a strong foundation for their future endeavors.
+          </p>
+        </div>
       )}
     </div>
   );

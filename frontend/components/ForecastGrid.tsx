@@ -15,45 +15,40 @@ interface Props {
 }
 
 function dayName(dateStr: string): string {
-  const d = new Date(dateStr + "T12:00:00Z");
-  return d.toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" });
+  return new Date(dateStr + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
 }
 
 function shortDate(dateStr: string): string {
-  const d = new Date(dateStr + "T12:00:00Z");
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+  return new Date(dateStr + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 }
 
 export default function ForecastGrid({ daily, locationName }: Props) {
-  if (!daily.length) return <p className="text-slate-500">No forecast data available.</p>;
+  if (!daily.length) return <p className="text-gray-500">No forecast data available.</p>;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {locationName && (
-        <h2 className="text-xl font-semibold text-slate-700">5-Day Forecast — {locationName}</h2>
+        <h2 className="text-lg font-semibold text-gray-800">5-Day Forecast — {locationName}</h2>
       )}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {daily.map((day) => (
-          <div
-            key={day.date}
-            className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <p className="font-semibold text-slate-800">{dayName(day.date)}</p>
-            <p className="text-xs text-slate-500">{shortDate(day.date)}</p>
+          <div key={day.date} className="rounded-lg border border-gray-200 bg-white p-4 text-center">
+            <p className="font-medium text-gray-800">{dayName(day.date)}</p>
+            <p className="text-xs text-gray-400">{shortDate(day.date)}</p>
             <Image
               src={`https://openweathermap.org/img/wn/${day.icon}@2x.png`}
               alt={day.description}
-              width={56}
-              height={56}
+              width={48}
+              height={48}
               unoptimized
-              className="my-1"
+              className="mx-auto my-1"
             />
-            <p className="text-xs capitalize text-slate-500 text-center">{day.description}</p>
-            <div className="mt-2 flex items-center gap-3 text-sm">
-              <span className="font-bold text-blue-600">{Math.round(day.temp_max)}°</span>
-              <span className="text-slate-400">{Math.round(day.temp_min)}°</span>
+            <p className="text-xs text-gray-500 capitalize">{day.description}</p>
+            <div className="mt-2 flex justify-center gap-2 text-sm">
+              <span className="font-semibold text-gray-900">{Math.round(day.temp_max)}°</span>
+              <span className="text-gray-400">{Math.round(day.temp_min)}°</span>
             </div>
-            <p className="mt-1 text-xs text-slate-400">💧 {day.humidity}%</p>
+            <p className="mt-1 text-xs text-gray-400">{day.humidity}% humidity</p>
           </div>
         ))}
       </div>

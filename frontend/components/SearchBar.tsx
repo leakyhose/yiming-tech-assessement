@@ -13,7 +13,6 @@ export default function SearchBar({ onSearch, loading }: Props) {
   const [geoError, setGeoError] = useState("");
   const [geoSupported, setGeoSupported] = useState(false);
 
-  // Detect geolocation support only on the client (avoids SSR hydration mismatch)
   useEffect(() => {
     setGeoSupported("geolocation" in navigator);
   }, []);
@@ -35,8 +34,6 @@ export default function SearchBar({ onSearch, loading }: Props) {
       (err) => {
         if (err.code === err.PERMISSION_DENIED) {
           setGeoError("Location access was denied. Please enter a location manually.");
-        } else if (err.code === err.POSITION_UNAVAILABLE) {
-          setGeoError("Your location is currently unavailable. Please enter a location manually.");
         } else {
           setGeoError("Could not retrieve your location. Please enter a location manually.");
         }
@@ -46,21 +43,20 @@ export default function SearchBar({ onSearch, loading }: Props) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="City, zip code, GPS coordinates, or landmark…"
-          className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          className="flex-1 rounded-md border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           disabled={loading}
-          aria-label="Location search"
         />
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
           {loading ? "Searching…" : "Search"}
         </button>
@@ -69,10 +65,9 @@ export default function SearchBar({ onSearch, loading }: Props) {
             type="button"
             onClick={handleGeolocate}
             disabled={loading}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition-colors"
-            aria-label="Use my current location"
+            className="rounded-md border border-gray-300 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
-            📍 My location
+            My Location
           </button>
         )}
       </form>

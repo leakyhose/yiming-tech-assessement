@@ -7,16 +7,12 @@ interface Video {
   channelTitle: string;
 }
 
-interface Props {
-  videos: Video[];
-}
-
-export default function YoutubePanel({ videos }: Props) {
+export default function YoutubePanel({ videos }: { videos: Video[] }) {
   if (!videos.length) return null;
 
   return (
     <div>
-      <h3 className="mb-3 text-base font-semibold text-slate-700">Videos</h3>
+      <h3 className="mb-3 text-sm font-semibold text-gray-700">Videos</h3>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {videos.map((v) => (
           <a
@@ -24,23 +20,20 @@ export default function YoutubePanel({ videos }: Props) {
             href={`https://www.youtube.com/watch?v=${v.videoId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow"
+            className="group overflow-hidden rounded-lg border border-gray-200 bg-white hover:border-gray-300 transition-colors"
           >
             <div className="relative aspect-video overflow-hidden">
               <Image
                 src={v.thumbnail}
                 alt={v.title}
                 fill
-                className="object-cover transition-transform group-hover:scale-105"
+                className="object-cover group-hover:opacity-90 transition-opacity"
                 sizes="(max-width: 640px) 100vw, 33vw"
               />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-3xl">▶</span>
-              </div>
             </div>
             <div className="p-3">
-              <p className="text-sm font-medium text-slate-800 line-clamp-2">{v.title}</p>
-              <p className="mt-1 text-xs text-slate-500">{v.channelTitle}</p>
+              <p className="text-sm font-medium text-gray-800 line-clamp-2">{v.title}</p>
+              <p className="mt-0.5 text-xs text-gray-500">{v.channelTitle}</p>
             </div>
           </a>
         ))}

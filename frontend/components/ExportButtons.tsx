@@ -3,19 +3,14 @@
 import { useState } from "react";
 import { exportData } from "@/lib/api";
 
-const FORMATS = [
-  { key: "json", label: "JSON", mime: "application/json" },
-  { key: "csv", label: "CSV", mime: "text/csv" },
-  { key: "xml", label: "XML", mime: "application/xml" },
-  { key: "pdf", label: "PDF", mime: "application/pdf" },
-  { key: "markdown", label: "Markdown", mime: "text/markdown" },
-] as const;
+const FORMATS = ["json", "csv", "xml", "pdf", "markdown"] as const;
+const EXT: Record<string, string> = { json: "json", csv: "csv", xml: "xml", pdf: "pdf", markdown: "md" };
 
 export default function ExportButtons() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  async function handleExport(format: string, filename: string) {
+  async function handleExport(format: string) {
     setBusy(format);
     setError("");
     try {
@@ -23,7 +18,7 @@ export default function ExportButtons() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = filename;
+      a.download = `weather_queries.${EXT[format]}`;
       a.click();
       URL.revokeObjectURL(url);
     } catch {
@@ -33,21 +28,17 @@ export default function ExportButtons() {
     }
   }
 
-  const ext: Record<string, string> = {
-    json: "json", csv: "csv", xml: "xml", pdf: "pdf", markdown: "md",
-  };
-
   return (
     <div>
       <div className="flex flex-wrap gap-2">
-        {FORMATS.map(({ key, label }) => (
+        {FORMATS.map((f) => (
           <button
-            key={key}
-            onClick={() => handleExport(key, `weather_queries.${ext[key]}`)}
+            key={f}
+            onClick={() => handleExport(f)}
             disabled={busy !== null}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors uppercase"
           >
-            {busy === key ? "Exporting…" : `↓ ${label}`}
+            {busy === f ? "Exporting…" : f}
           </button>
         ))}
       </div>
