@@ -12,6 +12,18 @@ interface Props {
   };
 }
 
+const weatherEmoji: Record<string, string> = {
+  '01d': '☀️', '01n': '🌙',
+  '02d': '⛅', '02n': '☁️',
+  '03d': '☁️', '03n': '☁️',
+  '04d': '☁️', '04n': '☁️',
+  '09d': '🌧️', '09n': '🌧️',
+  '10d': '🌦️', '10n': '🌧️',
+  '11d': '⛈️', '11n': '⛈️',
+  '13d': '❄️', '13n': '❄️',
+  '50d': '🌫️', '50n': '🌫️',
+};
+
 function formatTime(unix: number): string {
   return new Date(unix * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
@@ -19,7 +31,7 @@ function formatTime(unix: number): string {
 export default function WeatherCard({ data }: Props) {
   const { weather } = data;
   const condition = weather.weather[0];
-  const iconUrl = condition.icon ? `https://openweathermap.org/img/wn/${condition.icon}@2x.png` : '';
+  const emoji = weatherEmoji[condition.icon] || '🌡️';
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-5">
@@ -31,18 +43,8 @@ export default function WeatherCard({ data }: Props) {
           <p className="text-sm text-gray-500 capitalize">{condition.description}</p>
           <p className="text-sm text-gray-400">Feels like {Math.round(weather.main.feels_like)}°F</p>
         </div>
-        <div className="flex items-center gap-1">
-          {iconUrl && (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={iconUrl}
-              alt={condition.description}
-              width={56}
-              height={56}
-              referrerPolicy="no-referrer"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-          )}
+        <div className="flex items-center gap-2">
+          <span className="text-5xl">{emoji}</span>
           <span className="text-5xl font-semibold text-gray-900 tabular-nums">
             {Math.round(weather.main.temp)}°F
           </span>
