@@ -29,7 +29,7 @@ def _flatten_record(record: dict[str, Any]) -> dict[str, Any]:
         "longitude": record.get("longitude"),
         "start_date": str(record.get("start_date", "")),
         "end_date": str(record.get("end_date", "")),
-        "date_range": f"{dates[0] if dates else ''} — {dates[-1] if dates else ''}",
+        "date_range": f"{dates[0] if dates else ''} to {dates[-1] if dates else ''}",
         "temp_max_f": temp_max[0] if temp_max else None,
         "temp_min_f": temp_min[0] if temp_min else None,
         "precipitation_mm": precip[0] if precip else None,

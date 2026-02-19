@@ -6,7 +6,7 @@ import "./globals.css";
 const syne = Syne({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Weather App — Yiming Su",
+  title: "Weather App - Yiming Su",
   description: "Full-stack weather application with current conditions, 5-day forecast, and historical data.",
 };
 

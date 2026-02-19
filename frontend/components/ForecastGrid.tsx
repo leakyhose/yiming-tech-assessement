@@ -28,7 +28,7 @@ export default function ForecastGrid({ daily, locationName }: Props) {
   return (
     <div className="space-y-3">
       {locationName && (
-        <h2 className="text-lg font-semibold text-gray-800">5-Day Forecast — {locationName}</h2>
+        <h2 className="text-lg font-semibold text-gray-800">5-Day Forecast: {locationName}</h2>
       )}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {daily.map((day) => (

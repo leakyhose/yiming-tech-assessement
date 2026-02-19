@@ -22,8 +22,6 @@ function wrap<T>(fn: () => Promise<T>): Promise<T> {
   });
 }
 
-// ── Types ────────────────────────────────────────────────────────────────────
-
 export interface WeatherQueryCreate {
   location: string;
   start_date: string;
@@ -49,15 +47,11 @@ export interface WeatherQueryRecord {
   updated_at: string;
 }
 
-// ── Weather ──────────────────────────────────────────────────────────────────
-
 export const fetchCurrentWeather = (location: string) =>
   wrap(() => api.get("/api/weather/current", { params: { location } }).then((r) => r.data));
 
 export const fetchForecast = (location: string) =>
   wrap(() => api.get("/api/weather/forecast", { params: { location } }).then((r) => r.data));
-
-// ── Media ────────────────────────────────────────────────────────────────────
 
 export const fetchYouTube = (location: string) =>
   wrap(() => api.get("/api/media/youtube", { params: { location } }).then((r) => r.data));
@@ -67,8 +61,6 @@ export const fetchMaps = (location: string) =>
 
 export const fetchPhotos = (location: string) =>
   wrap(() => api.get("/api/media/photos", { params: { location } }).then((r) => r.data));
-
-// ── CRUD ─────────────────────────────────────────────────────────────────────
 
 export const createQuery = (body: WeatherQueryCreate): Promise<WeatherQueryRecord> =>
   wrap(() => api.post("/api/queries/", body).then((r) => r.data));
@@ -84,8 +76,6 @@ export const updateQuery = (id: number, body: WeatherQueryUpdate): Promise<Weath
 
 export const deleteQuery = (id: number): Promise<void> =>
   wrap(() => api.delete(`/api/queries/${id}`).then((r) => r.data));
-
-// ── Export ───────────────────────────────────────────────────────────────────
 
 export const exportData = (format: string) =>
   wrap(() =>

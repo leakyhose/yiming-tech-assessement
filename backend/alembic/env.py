@@ -23,7 +23,7 @@ if db_url:
 
 # Import Base and all models so autogenerate can detect them
 from app.database import Base  # noqa: E402
-import app.models.weather_query  # noqa: F401 — registers model with Base
+import app.models.weather_query  # noqa: F401
 
 target_metadata = Base.metadata
 

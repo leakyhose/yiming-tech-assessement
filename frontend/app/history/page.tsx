@@ -51,7 +51,6 @@ export default function HistoryPage() {
         <p className="mt-1 text-sm text-gray-500">Store and manage weather queries for custom date ranges. Export in multiple formats.</p>
       </div>
 
-      {/* Create form */}
       <section className="rounded-lg border border-gray-200 p-5">
         <h2 className="mb-4 text-sm font-semibold text-gray-700">Add New Query</h2>
         <form onSubmit={handleCreate} className="space-y-3">
@@ -99,13 +98,11 @@ export default function HistoryPage() {
         </form>
       </section>
 
-      {/* Export */}
       <section>
         <h2 className="mb-3 text-sm font-semibold text-gray-700">Export Data</h2>
         <ExportButtons />
       </section>
 
-      {/* Table */}
       <section>
         <h2 className="mb-3 text-sm font-semibold text-gray-700">All Queries</h2>
         <HistoryTable reloadRef={reloadRef} />

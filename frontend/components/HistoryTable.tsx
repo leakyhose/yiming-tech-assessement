@@ -114,7 +114,6 @@ export default function HistoryTable({ reloadRef }: { reloadRef?: MutableRefObje
         <p className="text-sm text-gray-400">No records yet. Create one above.</p>
       )}
 
-      {/* Desktop table */}
       {records.length > 0 && (
         <div className="hidden md:block overflow-x-auto rounded-lg border border-gray-200">
           <table className="w-full text-sm">
@@ -141,7 +140,7 @@ export default function HistoryTable({ reloadRef }: { reloadRef?: MutableRefObje
                         <span className="font-medium text-gray-800">{r.location}</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-500 max-w-[160px] truncate">{r.resolved_location || "—"}</td>
+                    <td className="px-4 py-3 text-gray-500 max-w-[160px] truncate">{r.resolved_location || "N/A"}</td>
                     <td className="px-4 py-3 tabular-nums">
                       {editingId === r.id ? (
                         <div className="flex flex-col gap-1">
@@ -149,7 +148,7 @@ export default function HistoryTable({ reloadRef }: { reloadRef?: MutableRefObje
                           <input type="date" value={editForm.end_date || ""} onChange={(e) => setEditForm((f) => ({ ...f, end_date: e.target.value }))} className="rounded border border-gray-300 px-2 py-1 text-xs outline-none focus:border-blue-400" />
                         </div>
                       ) : (
-                        <span className="text-gray-600">{r.start_date} — {r.end_date}</span>
+                        <span className="text-gray-600">{r.start_date} to {r.end_date}</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-gray-400">{new Date(r.created_at).toLocaleDateString()}</td>
@@ -187,7 +186,6 @@ export default function HistoryTable({ reloadRef }: { reloadRef?: MutableRefObje
         </div>
       )}
 
-      {/* Mobile cards */}
       {records.length > 0 && (
         <div className="space-y-2 md:hidden">
           {records.map((r) => (
@@ -195,8 +193,8 @@ export default function HistoryTable({ reloadRef }: { reloadRef?: MutableRefObje
               <div className="flex justify-between">
                 <div>
                   <p className="font-medium text-gray-800">{r.location}</p>
-                  <p className="text-xs text-gray-500">{r.resolved_location || "—"}</p>
-                  <p className="text-xs text-gray-400">{r.start_date} — {r.end_date}</p>
+                  <p className="text-xs text-gray-500">{r.resolved_location || "N/A"}</p>
+                  <p className="text-xs text-gray-400">{r.start_date} to {r.end_date}</p>
                 </div>
                 <p className="text-xs text-gray-300">#{r.id}</p>
               </div>

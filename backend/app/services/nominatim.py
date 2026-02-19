@@ -11,9 +11,9 @@ async def resolve_location(query: str) -> dict:
     Resolve a location string to {resolved_name, latitude, longitude}.
 
     Resolution order:
-    1. GPS coordinates (e.g. "40.7128,-74.0060") — parsed directly, no API call.
-    2. OWM Geocoding API — reliable for cities, towns, and zip codes.
-    3. Nominatim (OpenStreetMap) — fallback for landmarks and addresses.
+    1. GPS coordinates (e.g. "40.7128,-74.0060") - parsed directly, no API call.
+    2. OWM Geocoding API - reliable for cities, towns, and zip codes.
+    3. Nominatim (OpenStreetMap) - fallback for landmarks and addresses.
     """
     query = query.strip()
 
@@ -23,7 +23,7 @@ async def resolve_location(query: str) -> dict:
         lat, lon = float(coords.group(1)), float(coords.group(2))
         return {"resolved_name": f"{lat}, {lon}", "latitude": lat, "longitude": lon}
 
-    # 2. OWM Geocoding API (primary — uses the same key, built for weather city lookups)
+    # 2. OWM Geocoding API (primary, uses the same key, built for weather city lookups)
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
             resp = await client.get(

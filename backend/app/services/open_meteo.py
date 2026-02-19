@@ -42,23 +42,15 @@ async def _fetch(url: str, lat: float, lon: float, start: date, end: date) -> di
 
 
 async def get_weather_for_range(lat: float, lon: float, start_date: date, end_date: date) -> dict:
-    """
-    Fetch weather data for a date range.
-    - Past dates → archive endpoint
-    - Future dates → forecast endpoint
-    - Mixed ranges → split and merge
-    Returns Open-Meteo daily structure.
-    """
+    """Fetch weather data for a date range using archive or forecast endpoints as needed."""
     today = datetime.now(tz=timezone.utc).date()
 
     if end_date <= today:
-        # Entirely historical
         return await _fetch(ARCHIVE_URL, lat, lon, start_date, end_date)
     elif start_date > today:
-        # Entirely in the future
         return await _fetch(FORECAST_URL, lat, lon, start_date, end_date)
     else:
-        # Spans today — split at today
+        # Spans today, split at today
         past_data = await _fetch(ARCHIVE_URL, lat, lon, start_date, today)
         from datetime import timedelta
         future_start = today + timedelta(days=1)

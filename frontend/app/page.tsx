@@ -101,7 +101,6 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
-      {/* Search */}
       <div className="text-center">
         <h1 className="mb-1 text-2xl font-semibold text-gray-900">Weather App</h1>
         <p className="mb-4 text-sm text-gray-500">Search any city, zip code, GPS coordinates, or landmark for real-time weather.</p>
@@ -119,14 +118,12 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Weather results */}
       {weather && !loading && (
         <>
           {photos && !photoError && <PhotoBanner photos={photos.photos} />}
 
           <WeatherCard data={weather} />
 
-          {/* Save to Queries */}
           <div>
             {!saveOpen && !saveSuccess && (
               <button
@@ -194,7 +191,6 @@ export default function HomePage() {
         </>
       )}
 
-      {/* About — shown only before any search */}
       {!weather && !loading && !error && (
         <div className="mt-8 border-t border-gray-100 pt-8 text-center">
           <div className="flex items-center justify-center gap-3 mb-1">
@@ -206,7 +202,7 @@ export default function HomePage() {
           <p className="text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
             The Product Manager Accelerator Program is designed to support PM professionals through every stage of their careers.
             From students looking for entry-level jobs to Directors looking to take on a leadership role, our program has helped
-            hundreds of students fulfill their career aspirations. Our community are ambitious and committed — through our program
+            hundreds of students fulfill their career aspirations. Our community are ambitious and committed; through our program
             they have learnt, honed, and developed new PM and leadership skills, giving them a strong foundation for their future endeavors.
           </p>
         </div>
