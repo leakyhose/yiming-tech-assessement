@@ -19,7 +19,7 @@ function formatTime(unix: number): string {
 export default function WeatherCard({ data }: Props) {
   const { weather } = data;
   const condition = weather.weather[0];
-  const iconUrl = `https://openweathermap.org/img/wn/${condition.icon}@2x.png`;
+  const iconUrl = condition.icon ? `https://openweathermap.org/img/wn/${condition.icon}@2x.png` : '';
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-5">
@@ -32,8 +32,17 @@ export default function WeatherCard({ data }: Props) {
           <p className="text-sm text-gray-400">Feels like {Math.round(weather.main.feels_like)}°F</p>
         </div>
         <div className="flex items-center gap-1">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={iconUrl} alt={condition.description} width={56} height={56} />
+          {iconUrl && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={iconUrl}
+              alt={condition.description}
+              width={56}
+              height={56}
+              referrerPolicy="no-referrer"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          )}
           <span className="text-5xl font-semibold text-gray-900 tabular-nums">
             {Math.round(weather.main.temp)}°F
           </span>

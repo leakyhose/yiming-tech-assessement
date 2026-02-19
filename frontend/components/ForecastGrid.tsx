@@ -33,14 +33,18 @@ export default function ForecastGrid({ daily, locationName }: Props) {
           <div key={day.date} className="rounded-lg border border-gray-200 bg-white p-4 text-center">
             <p className="font-medium text-gray-800">{dayName(day.date)}</p>
             <p className="text-xs text-gray-400">{shortDate(day.date)}</p>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`https://openweathermap.org/img/wn/${day.icon}@2x.png`}
-              alt={day.description}
-              width={48}
-              height={48}
-              className="mx-auto my-1"
-            />
+            {day.icon && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={`https://openweathermap.org/img/wn/${day.icon}@2x.png`}
+                alt={day.description}
+                width={48}
+                height={48}
+                className="mx-auto my-1"
+                referrerPolicy="no-referrer"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            )}
             <p className="text-xs text-gray-500 capitalize">{day.description}</p>
             <div className="mt-2 flex justify-center gap-2 text-sm">
               <span className="font-semibold text-gray-900">H {Math.round(day.temp_max)}°</span>
