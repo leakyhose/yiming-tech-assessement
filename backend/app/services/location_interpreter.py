@@ -1,22 +1,15 @@
 import json
 import re
-from dataclasses import dataclass
 
+from fastapi import HTTPException
 from google import genai
 from app.config import settings
 
 _client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 
-@dataclass
-class LocationResult:
-    name: str
-    lat: float | None = None
-    lon: float | None = None
-
-
-async def interpret_location(raw_input: str) -> LocationResult:
-    """Use Gemini 2.5 Flash Lite to extract a location from natural language input."""
+async def interpret_location(raw_input: str) -> dict:
+    """Use Gemini to resolve any location input to a name and coordinates."""
     try:
         response = await _client.aio.models.generate_content(
             model="gemini-2.5-flash-lite",
@@ -38,10 +31,11 @@ async def interpret_location(raw_input: str) -> LocationResult:
         data = json.loads(text)
         lat = data.get("lat")
         lon = data.get("lon")
-        return LocationResult(
-            name=data.get("name") or raw_input,
-            lat=float(lat) if lat is not None else None,
-            lon=float(lon) if lon is not None else None,
-        )
+        name = data.get("name") or raw_input
+        if lat is None or lon is None:
+            raise HTTPException(status_code=422, detail=f"Could not resolve location: '{raw_input}'")
+        return {"resolved_name": name, "latitude": float(lat), "longitude": float(lon)}
+    except HTTPException:
+        raise
     except Exception:
-        return LocationResult(name=raw_input)
+        raise HTTPException(status_code=422, detail=f"Could not resolve location: '{raw_input}'")

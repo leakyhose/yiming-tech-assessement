@@ -1,15 +1,12 @@
 from urllib.parse import quote
 
 from app.config import settings
-from app.services.nominatim import resolve_location
+from app.services.location_interpreter import interpret_location
 
 
 async def get_map_data(location: str) -> dict:
-    """
-    Geocode the location and build a Google Maps Embed URL.
-    Returns {latitude, longitude, resolved_name, embed_url}.
-    """
-    geo = await resolve_location(location)
+    """Geocode the location and build a Google Maps Embed URL."""
+    geo = await interpret_location(location)
     encoded_name = quote(geo["resolved_name"])
     embed_url = (
         f"https://www.google.com/maps/embed/v1/place"

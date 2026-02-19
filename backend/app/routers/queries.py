@@ -8,7 +8,6 @@ from app.database import get_db
 from app.models.weather_query import WeatherQuery
 from app.schemas.weather_query import WeatherQueryCreate, WeatherQueryUpdate, WeatherQueryResponse
 from app.services.location_interpreter import interpret_location
-from app.services.nominatim import resolve_location
 from app.services.open_meteo import get_weather_for_range
 
 router = APIRouter(prefix="/queries", tags=["queries"])
@@ -41,11 +40,7 @@ def _validate_date_range(start_date, end_date):
 async def create_query(body: WeatherQueryCreate, db: AsyncSession = Depends(get_db)):
     _validate_date_range(body.start_date, body.end_date)
 
-    interpreted = await interpret_location(body.location)
-    if interpreted.lat is not None and interpreted.lon is not None:
-        geo = {"resolved_name": interpreted.name, "latitude": interpreted.lat, "longitude": interpreted.lon}
-    else:
-        geo = await resolve_location(interpreted.name)
+    geo = await interpret_location(body.location)
     weather_data = await get_weather_for_range(
         geo["latitude"], geo["longitude"], body.start_date, body.end_date
     )
@@ -108,7 +103,7 @@ async def update_query(
     _validate_date_range(record.start_date, record.end_date)
 
     if location_changed:
-        geo = await resolve_location(record.location)
+        geo = await interpret_location(record.location)
         record.resolved_location = geo["resolved_name"]
         record.latitude = geo["latitude"]
         record.longitude = geo["longitude"]
