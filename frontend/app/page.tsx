@@ -57,8 +57,8 @@ export default function HomePage() {
       const weatherResult = await fetchCurrentWeather(location);
       setWeather(weatherResult);
 
-      // Use the resolved city name so zip codes / GPS coords produce relevant media.
-      resolvedName = weatherResult.weather?.name || location;
+      // Use the resolved location name from our AI layer for media APIs
+      resolvedName = weatherResult.resolved_location || location;
       setCurrentLocation(resolvedName);
 
       const photosResult = await fetchPhotos(resolvedName).catch(() => null);

@@ -11,8 +11,10 @@ async def get_photos(location: str) -> list:
     Search Unsplash for photos of the given location.
     Returns list of {url, alt, photographer, photographer_url}.
     """
+    # Add "city skyline" to get more relevant city photos
+    query = f"{location} city skyline"
     params = {
-        "query": location,
+        "query": query,
         "per_page": 3,
         "client_id": settings.UNSPLASH_ACCESS_KEY,
     }
