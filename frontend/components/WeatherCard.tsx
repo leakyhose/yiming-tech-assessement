@@ -28,7 +28,7 @@ export default function WeatherCard({ data }: Props) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold text-gray-900">
-            {weather.name}, {weather.sys.country}
+            {data.resolved_location}
           </h2>
           <p className="text-sm text-gray-500 capitalize">{condition.description}</p>
           <p className="text-sm text-gray-400">Feels like {Math.round(weather.main.feels_like)}°F</p>

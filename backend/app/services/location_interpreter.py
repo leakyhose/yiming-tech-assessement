@@ -1,30 +1,55 @@
+import json
+import re
+from dataclasses import dataclass
+
 from google import genai
 from app.config import settings
 
 _client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 
-async def interpret_location(raw_input: str) -> str:
-    """
-    Use Gemini 2.5 Flash Lite to extract a clean location string from natural language.
+@dataclass
+class LocationResult:
+    name: str
+    lat: float | None = None
+    lon: float | None = None
 
-    Short inputs (< 4 words) are returned as-is since they're almost certainly
-    already a city name, zip code, or GPS coordinate.
+
+async def interpret_location(raw_input: str) -> LocationResult:
+    """
+    Use Gemini 2.5 Flash Lite to extract a location from natural language.
+
+    Returns a LocationResult with:
+    - name: clean display name (used for media searches and resolved_location)
+    - lat/lon: coordinates if Gemini knows them confidently, else None
+
+    When lat/lon are provided the caller can skip OWM geocoding entirely.
+    Short inputs (< 4 words) bypass Gemini and return as-is.
     """
     if len(raw_input.split()) < 4:
-        return raw_input
+        return LocationResult(name=raw_input)
 
     try:
         response = await _client.aio.models.generate_content(
             model="gemini-2.5-flash-lite",
             contents=(
-                "Extract the specific location from the input below and return ONLY "
-                "the location name or coordinates — nothing else, no explanation.\n"
-                "If the input is already a location (city, zip, GPS coords, landmark), return it unchanged.\n\n"
+                "Extract the location from the input below. "
+                "Return ONLY a JSON object with these fields:\n"
+                '  "name": clean location name (city, landmark, or address)\n'
+                '  "lat": latitude as a float if you know it confidently, otherwise null\n'
+                '  "lon": longitude as a float if you know it confidently, otherwise null\n\n'
                 f"Input: {raw_input}"
             ),
         )
-        return response.text.strip()
+        # Strip markdown code fences if present
+        text = re.sub(r"^```(?:json)?\s*|\s*```$", "", response.text.strip(), flags=re.MULTILINE)
+        data = json.loads(text)
+        lat = data.get("lat")
+        lon = data.get("lon")
+        return LocationResult(
+            name=data.get("name") or raw_input,
+            lat=float(lat) if lat is not None else None,
+            lon=float(lon) if lon is not None else None,
+        )
     except Exception:
-        # If Gemini fails for any reason, fall back to the raw input
-        return raw_input
+        return LocationResult(name=raw_input)

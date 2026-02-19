@@ -42,7 +42,10 @@ async def create_query(body: WeatherQueryCreate, db: AsyncSession = Depends(get_
     _validate_date_range(body.start_date, body.end_date)
 
     interpreted = await interpret_location(body.location)
-    geo = await resolve_location(interpreted)
+    if interpreted.lat is not None and interpreted.lon is not None:
+        geo = {"resolved_name": interpreted.name, "latitude": interpreted.lat, "longitude": interpreted.lon}
+    else:
+        geo = await resolve_location(interpreted.name)
     weather_data = await get_weather_for_range(
         geo["latitude"], geo["longitude"], body.start_date, body.end_date
     )
