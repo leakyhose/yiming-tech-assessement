@@ -11,11 +11,11 @@ async def get_photos(location: str) -> list:
     Search Unsplash for photos of the given location.
     Returns list of {url, alt, photographer, photographer_url}.
     """
-    # Add "city skyline" to get more relevant city photos
-    query = f"{location} city skyline"
+    # Use just the location name - Unsplash matches landmarks well
     params = {
-        "query": query,
+        "query": location,
         "per_page": 3,
+        "orientation": "landscape",
         "client_id": settings.UNSPLASH_ACCESS_KEY,
     }
     async with httpx.AsyncClient(timeout=10.0) as client:
