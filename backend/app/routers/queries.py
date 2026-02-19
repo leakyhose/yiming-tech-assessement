@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.weather_query import WeatherQuery
 from app.schemas.weather_query import WeatherQueryCreate, WeatherQueryUpdate, WeatherQueryResponse
+from app.services.location_interpreter import interpret_location
 from app.services.nominatim import resolve_location
 from app.services.open_meteo import get_weather_for_range
 
@@ -40,7 +41,8 @@ def _validate_date_range(start_date, end_date):
 async def create_query(body: WeatherQueryCreate, db: AsyncSession = Depends(get_db)):
     _validate_date_range(body.start_date, body.end_date)
 
-    geo = await resolve_location(body.location)
+    interpreted = await interpret_location(body.location)
+    geo = await resolve_location(interpreted)
     weather_data = await get_weather_for_range(
         geo["latitude"], geo["longitude"], body.start_date, body.end_date
     )

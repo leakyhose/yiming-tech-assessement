@@ -49,7 +49,7 @@ export default function SearchBar({ onSearch, loading }: Props) {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="City, zip code, GPS coordinates, or landmark…"
+          placeholder="City, zip, coordinates, or try &quot;weather near the Eiffel Tower&quot;…"
           className="flex-1 rounded-md border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           disabled={loading}
         />
