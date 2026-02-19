@@ -33,11 +33,15 @@ async def interpret_location(raw_input: str) -> LocationResult:
         response = await _client.aio.models.generate_content(
             model="gemini-2.5-flash-lite",
             contents=(
-                "Extract the location from the input below. "
+                "You are a location resolver. Given any input — a city name, landmark, address, "
+                "natural language description, or even a vague reference like 'the city with the big tower in France' "
+                "or 'where the Olympics were held in 2008' — identify the most likely real-world location "
+                "and return your best guess with coordinates.\n\n"
                 "Return ONLY a JSON object with these fields:\n"
-                '  "name": clean location name (city, landmark, or address)\n'
-                '  "lat": latitude as a float if you know it confidently, otherwise null\n'
-                '  "lon": longitude as a float if you know it confidently, otherwise null\n\n'
+                '  "name": clean human-readable location name (e.g. "Paris, France" or "Beijing, China")\n'
+                '  "lat": latitude as a float (your best guess — always provide this)\n'
+                '  "lon": longitude as a float (your best guess — always provide this)\n\n'
+                "Always return lat and lon. If you are uncertain, give the most likely match.\n\n"
                 f"Input: {raw_input}"
             ),
         )
