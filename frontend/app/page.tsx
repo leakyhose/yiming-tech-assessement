@@ -197,7 +197,11 @@ export default function HomePage() {
       {/* About — shown only before any search */}
       {!weather && !loading && !error && (
         <div className="mt-8 border-t border-gray-100 pt-8 text-center">
-          <p className="text-xs text-gray-400 mb-1">Built by Yiming Su</p>
+          <div className="flex items-center justify-center gap-3 mb-1">
+            <p className="text-xs text-gray-400">Built by Yiming Su</p>
+            <a href="https://www.linkedin.com/in/yiming-su-b0115418b/" target="_blank" rel="noopener noreferrer" className="text-xs text-gray-400 hover:text-gray-600 underline transition-colors">LinkedIn</a>
+            <a href="https://github.com/leakyhose" target="_blank" rel="noopener noreferrer" className="text-xs text-gray-400 hover:text-gray-600 underline transition-colors">GitHub</a>
+          </div>
           <h2 className="text-base font-semibold text-gray-800 mb-2">About PM Accelerator</h2>
           <p className="text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
             The Product Manager Accelerator Program is designed to support PM professionals through every stage of their careers.
