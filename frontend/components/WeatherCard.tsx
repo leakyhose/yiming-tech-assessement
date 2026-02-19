@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 interface Props {
   data: {
     resolved_location: string;
@@ -34,7 +32,8 @@ export default function WeatherCard({ data }: Props) {
           <p className="text-sm text-gray-400">Feels like {Math.round(weather.main.feels_like)}°F</p>
         </div>
         <div className="flex items-center gap-1">
-          <Image src={iconUrl} alt={condition.description} width={56} height={56} unoptimized />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={iconUrl} alt={condition.description} width={56} height={56} />
           <span className="text-5xl font-semibold text-gray-900 tabular-nums">
             {Math.round(weather.main.temp)}°F
           </span>
