@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ErrorMessage from "./ErrorMessage";
 
 interface Props {
@@ -11,11 +11,6 @@ interface Props {
 export default function SearchBar({ onSearch, loading }: Props) {
   const [input, setInput] = useState("");
   const [geoError, setGeoError] = useState("");
-  const [geoSupported, setGeoSupported] = useState(false);
-
-  useEffect(() => {
-    setGeoSupported("geolocation" in navigator);
-  }, []);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,6 +20,10 @@ export default function SearchBar({ onSearch, loading }: Props) {
 
   function handleGeolocate() {
     setGeoError("");
+    if (!("geolocation" in navigator)) {
+      setGeoError("Geolocation is not supported by your browser.");
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const loc = `${pos.coords.latitude.toFixed(5)},${pos.coords.longitude.toFixed(5)}`;
@@ -49,7 +48,7 @@ export default function SearchBar({ onSearch, loading }: Props) {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="City, zip, coordinates, or try &quot;weather near the Eiffel Tower&quot;…"
+          placeholder="City, zip, coordinates, or natural language."
           className="flex-1 rounded-md border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           disabled={loading}
         />
@@ -60,16 +59,14 @@ export default function SearchBar({ onSearch, loading }: Props) {
         >
           {loading ? "Searching…" : "Search"}
         </button>
-        {geoSupported && (
-          <button
-            type="button"
-            onClick={handleGeolocate}
-            disabled={loading}
-            className="rounded-md border border-gray-300 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-          >
-            My Location
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleGeolocate}
+          disabled={loading}
+          className="rounded-md border border-gray-300 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+        >
+          My Location
+        </button>
       </form>
       {geoError && <ErrorMessage message={geoError} />}
     </div>

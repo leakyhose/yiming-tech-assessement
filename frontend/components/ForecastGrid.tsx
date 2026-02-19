@@ -45,8 +45,8 @@ export default function ForecastGrid({ daily, locationName }: Props) {
             />
             <p className="text-xs text-gray-500 capitalize">{day.description}</p>
             <div className="mt-2 flex justify-center gap-2 text-sm">
-              <span className="font-semibold text-gray-900">{Math.round(day.temp_max)}°</span>
-              <span className="text-gray-400">{Math.round(day.temp_min)}°</span>
+              <span className="font-semibold text-gray-900">H {Math.round(day.temp_max)}°</span>
+              <span className="text-gray-400">L {Math.round(day.temp_min)}°</span>
             </div>
             <p className="mt-1 text-xs text-gray-400">{day.humidity}% humidity</p>
           </div>
